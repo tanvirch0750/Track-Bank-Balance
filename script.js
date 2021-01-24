@@ -80,6 +80,12 @@ const displayMovements = movements => {
 };
 displayMovements(account1.movements);
 
+const calcCurrentBalance = movements => {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance}€`;
+};
+calcCurrentBalance(account2.movements);
+
 const createUserNames = accounts => {
   accounts.forEach(acc => {
     acc.username = acc.owner
