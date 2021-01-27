@@ -79,26 +79,24 @@ const displayMovements = movements => {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
 
 // CURRENT TOTAL BALANCE
 const calcCurrentBalance = movements => {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${balance}€`;
 };
-calcCurrentBalance(account1.movements);
 
 // DISPLAY SUMMARY_VALUE
-const calcDisplaySummary = movements => {
-  const income = movements
+const calcDisplaySummary = acc => {
+  const income = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
 
-  const out = movements
+  const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
 
-  const interest = movements
+  const interest = acc.movements
     .filter(mov => mov > 0)
     .map(deposit => (deposit * 1.2) / 100)
     .filter(int => int >= 1)
@@ -108,7 +106,6 @@ const calcDisplaySummary = movements => {
   labelSumOut.textContent = `${Math.abs(out)}€`;
   labelSumInterest.textContent = `${interest}€`;
 };
-calcDisplaySummary(account1.movements);
 
 // CREATE USER NAME
 const createUserNames = accounts => {
@@ -121,4 +118,33 @@ const createUserNames = accounts => {
   });
 };
 createUserNames(accounts);
-console.log(accounts);
+
+// LOGIN EVENT HANDLER
+let currentAccount;
+btnLogin.addEventListener('click', e => {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and Welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Dispaly Movments
+    displayMovements(currentAccount.movements);
+
+    // Display Balance
+    calcCurrentBalance(currentAccount.movements);
+
+    // Display Summary
+    calcDisplaySummary(currentAccount);
+  }
+});
