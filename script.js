@@ -62,10 +62,12 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 // DISPLAY ALL THE MOVEMENTS
-const displayMovements = movements => {
+const displayMovements = (movements, sort = false) => {
   containerMovements.innerHTML = '';
 
-  movements.forEach((mov, idx) => {
+  const movsSort = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movsSort.forEach((mov, idx) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
       <div class="movements__row">
@@ -218,4 +220,12 @@ btnClose.addEventListener('click', e => {
   }
 
   inputCloseUsername.value = inputClosePin.value = '';
+});
+
+// SORT MOVEMENTS HANDLER
+let sorted = !sorted;
+btnSort.addEventListener('click', e => {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
 });
