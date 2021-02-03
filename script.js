@@ -200,12 +200,39 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+// Timeout function
+const startLogoutTimer = () => {
+  // set time to five minutes
+  let time = 300;
+
+  const tick = () => {
+    const minutes = String(Math.trunc(time / 60)).padStart(2, '0');
+    const seconds = String(time % 60).padStart(2, '0');
+
+    // in each call print the remainning time into user interface(ui)
+    labelTimer.textContent = `${minutes}:${seconds}`;
+
+    // when 0 seconds stop the timer and logout
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+
+    // decrease time by 1s
+    time--;
+  };
+
+  // call the timer every second
+  tick();
+  const timer = setInterval(tick, 1000);
+
+  return timer;
+};
+
 ///////////////////////////////////////
 // Event handlers
-let currentAccount;
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
+let currentAccount, timer;
 
 btnLogin.addEventListener('click', function (e) {
   // Prevent form from submitting
@@ -250,6 +277,10 @@ btnLogin.addEventListener('click', function (e) {
     // const minute = `${now.getMinutes()}`.padStart(2, 0);
     //labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minute}`;
 
+    // TIMER
+    if (timer) clearInterval(timer);
+    timer = startLogoutTimer();
+
     // Update UI
     updateUI(currentAccount);
   }
@@ -279,6 +310,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     // Update UI
     updateUI(currentAccount);
+
+    // reset TIMER
+    clearInterval(timer);
+    timer = startLogoutTimer();
   }
 });
 
@@ -297,6 +332,10 @@ btnLoan.addEventListener('click', function (e) {
 
       // Update UI
       updateUI(currentAccount);
+
+      // reset TIMER
+      clearInterval(timer);
+      timer = startLogoutTimer();
     }, 2500);
   }
   inputLoanAmount.value = '';
